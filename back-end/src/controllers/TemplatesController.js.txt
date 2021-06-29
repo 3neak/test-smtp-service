@@ -1,0 +1,108 @@
+const Template = require('../models/Template')
+
+class TemplatesController {
+    async getTemplate(request, response) {
+        try {
+            const {id} = request.params
+            let data = await Template.findById(id)
+
+            response.status(200).json({
+                status: 'OK',
+                code: 200,
+                data
+            })
+        } catch (error) {
+            console.error(error)
+            response.status(500).json({
+                status: 'NOK',
+                code: 500,
+                data: error
+            })
+        }
+    }
+
+    async create(request, response) {
+        try {
+            const {template, subject} = request.body
+
+            const isValid = TemplatesController.#validateRequestParams(template, subject)
+
+            if (!isValid) {
+                response.status(422).json({
+                    status: 'NOK',
+                    code: 422,
+                    data: 'Some of required params are undefined !'
+                })
+                return
+            }
+
+            const templateObj = new Template({
+                template,
+                subject
+            })
+
+            const data = await templateObj.save()
+
+            response.status(200).json({
+                status: 'OK',
+                code: 200,
+                data
+            })
+        } catch (error) {
+            console.error(error)
+            response.status(500).json({
+                status: 'NOK',
+                code: 500,
+                data: error
+            })
+        }
+    }
+
+    async edit(request, response) {
+        try {
+            const {id, template, subject} = request.body
+
+            const isValid = TemplatesController.#validateRequestParams(id, template, subject)
+
+            if (!isValid) {
+                response.status(422).json({
+                    status: 'NOK',
+                    code: 422,
+                    data: 'Some of required params are undefined !'
+                })
+                return
+            }
+
+            let templateObj = await Template.findById(id)
+            templateObj.template = template
+            templateObj.subject = subject
+
+            const data = await templateObj.save()
+
+            response.status(200).json({
+                status: 'OK',
+                code: 200,
+                data
+            })
+        } catch (error) {
+            console.error(error)
+            response.status(500).json({
+                status: 'NOK',
+                code: 500,
+                data: error
+            })
+        }
+    }
+
+    static #validateRequestParams(...params) {
+        for (const param of params) {
+            if (param === undefined) {
+                return false
+            }
+        }
+
+        return true
+    }
+}
+
+module.exports = TemplatesController

@@ -1,0 +1,11 @@
+const Router = require('express')
+const Controller = require('../controllers/TemplatesController.js.txt')
+
+const controller = new Controller()
+const router = new Router()
+
+router.put('/template/edit', controller.edit)
+router.post('/template/create', controller.create)
+router.get('/template/:id', controller.getTemplate)
+
+module.exports = router
